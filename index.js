@@ -54,18 +54,13 @@ class Tree {
     } else if (value > node.value) {
       node.right = this.delete(value, node.right);
     } else {
-      // ✅ Found the node to delete
-
-      // Case 1: no children
       if (!node.left && !node.right) {
         return null;
       }
 
-      // Case 2: one child
       if (!node.left) return node.right;
       if (!node.right) return node.left;
 
-      // Case 3: two children
       let minValue = this.findMin(node.right);
       node.value = minValue;
       node.right = this.delete(minValue, node.right);
@@ -152,7 +147,6 @@ class Tree {
     traverse(this.root);
   }
 
-  // --- Utility: find node by value ---
   findNode(value, node = this.root) {
     if (!node) return null;
     if (node.value === value) return node;
@@ -160,20 +154,18 @@ class Tree {
     return this.findNode(value, node.right);
   }
 
-  // --- Height ---
   height(value) {
     const node = this.findNode(value);
     if (!node) return null;
 
     function calcHeight(n) {
-      if (!n) return -1; // base case
+      if (!n) return -1;
       return Math.max(calcHeight(n.left), calcHeight(n.right)) + 1;
     }
 
     return calcHeight(node);
   }
 
-  // --- Depth ---
   depth(value) {
     let depth = 0;
     let current = this.root;
@@ -184,10 +176,9 @@ class Tree {
       else current = current.right;
       depth++;
     }
-    return null; // not found
+    return null;
   }
 
-  // --- isBalanced ---
   isBalanced(node = this.root) {
     if (!node) return true;
 
@@ -210,6 +201,56 @@ class Tree {
 
     return checkBalance(node).balanced;
   }
+  inOrderArray(node = this.root, arr = []) {
+    if (!node) return arr;
+    this.inOrderArray(node.left, arr);
+    arr.push(node.value);
+    this.inOrderArray(node.right, arr);
+    return arr;
+  }
+
+  rebalance() {
+    const sortedValues = this.inOrderArray();
+    this.root = this.buildTree(sortedValues);
+  }
 }
-const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);
+
+function generateRandomArray(size, max = 100) {
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(Math.floor(Math.random() * max));
+  }
+  return arr;
+}
+
+const randomArray = generateRandomArray(10, 100);
+const tree = new Tree(randomArray);
+
+console.log("Initial array:", randomArray);
+console.log("Is balanced?", tree.isBalanced());
+
+console.log("Level-order:");
+tree.levelOrderForEach((n) => console.log(n.value));
+console.log("Pre-order:");
+tree.preOrderForEach((n) => console.log(n.value));
+console.log("Post-order:");
+tree.postOrderForEach((n) => console.log(n.value));
+console.log("In-order:");
+tree.inOrderForEach((n) => console.log(n.value));
+
+[101, 110, 120].forEach((n) => tree.insert(n));
+console.log("Is balanced after inserting >100?", tree.isBalanced());
+
+tree.rebalance();
+console.log("Is balanced after rebalance?", tree.isBalanced());
+
+console.log("Level-order after rebalance:");
+tree.levelOrderForEach((n) => console.log(n.value));
+console.log("Pre-order after rebalance:");
+tree.preOrderForEach((n) => console.log(n.value));
+console.log("Post-order after rebalance:");
+tree.postOrderForEach((n) => console.log(n.value));
+console.log("In-order after rebalance:");
+tree.inOrderForEach((n) => console.log(n.value));
+
 tree.prettyPrint(tree.root);
