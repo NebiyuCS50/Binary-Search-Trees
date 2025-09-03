@@ -152,17 +152,63 @@ class Tree {
     traverse(this.root);
   }
 
-  // --- Example buildTree for completeness ---
-  buildTree(array) {
-    if (array.length === 0) return null;
+  // --- Utility: find node by value ---
+  findNode(value, node = this.root) {
+    if (!node) return null;
+    if (node.value === value) return node;
+    if (value < node.value) return this.findNode(value, node.left);
+    return this.findNode(value, node.right);
+  }
 
-    const mid = Math.floor(array.length / 2);
-    const root = { value: array[mid], left: null, right: null };
+  // --- Height ---
+  height(value) {
+    const node = this.findNode(value);
+    if (!node) return null;
 
-    root.left = this.buildTree(array.slice(0, mid));
-    root.right = this.buildTree(array.slice(mid + 1));
+    function calcHeight(n) {
+      if (!n) return -1; // base case
+      return Math.max(calcHeight(n.left), calcHeight(n.right)) + 1;
+    }
 
-    return root;
+    return calcHeight(node);
+  }
+
+  // --- Depth ---
+  depth(value) {
+    let depth = 0;
+    let current = this.root;
+
+    while (current) {
+      if (value === current.value) return depth;
+      if (value < current.value) current = current.left;
+      else current = current.right;
+      depth++;
+    }
+    return null; // not found
+  }
+
+  // --- isBalanced ---
+  isBalanced(node = this.root) {
+    if (!node) return true;
+
+    function checkBalance(n) {
+      if (!n) return { height: -1, balanced: true };
+
+      const left = checkBalance(n.left);
+      const right = checkBalance(n.right);
+
+      const balanced =
+        left.balanced &&
+        right.balanced &&
+        Math.abs(left.height - right.height) <= 1;
+
+      return {
+        height: Math.max(left.height, right.height) + 1,
+        balanced,
+      };
+    }
+
+    return checkBalance(node).balanced;
   }
 }
 const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);
