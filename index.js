@@ -35,6 +35,51 @@ class Tree {
       this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
     }
   }
+  insert(value, node = this.root) {
+    if (node === null) {
+      return new Node(value);
+    }
+    if (value < node.value) {
+      node.left = this.insert(value, node.left);
+    } else if (value > node.value) {
+      node.right = this.insert(value, node.right);
+    }
+    return node;
+  }
+  delete(value, node = this.root) {
+    if (!node) return null;
+
+    if (value < node.value) {
+      node.left = this.delete(value, node.left);
+    } else if (value > node.value) {
+      node.right = this.delete(value, node.right);
+    } else {
+      // ✅ Found the node to delete
+
+      // Case 1: no children
+      if (!node.left && !node.right) {
+        return null;
+      }
+
+      // Case 2: one child
+      if (!node.left) return node.right;
+      if (!node.right) return node.left;
+
+      // Case 3: two children
+      let minValue = this.findMin(node.right);
+      node.value = minValue;
+      node.right = this.delete(minValue, node.right);
+    }
+
+    return node;
+  }
+
+  findMin(node) {
+    while (node.left) {
+      node = node.left;
+    }
+    return node.value;
+  }
 }
 const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);
 tree.prettyPrint(tree.root);
